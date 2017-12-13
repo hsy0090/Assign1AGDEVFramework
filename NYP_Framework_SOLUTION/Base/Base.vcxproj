@@ -24,6 +24,7 @@
     <ClCompile Include="Source\PlayerInfo\PlayerInfo.cpp" />
     <ClCompile Include="Source\Projectile\Grenade.cpp" />
     <ClCompile Include="Source\Projectile\Laser.cpp" />
+    <ClCompile Include="Source\Projectile\Mine.cpp" />
     <ClCompile Include="Source\Projectile\Projectile.cpp" />
     <ClCompile Include="Source\SceneGraph\SceneGraph.cpp" />
     <ClCompile Include="Source\SceneGraph\SceneNode.cpp" />
@@ -37,8 +38,11 @@
     <ClCompile Include="Source\TextEntity.cpp" />
     <ClCompile Include="Source\Waypoint\Waypoint.cpp" />
     <ClCompile Include="Source\Waypoint\WaypointManager.cpp" />
+    <ClCompile Include="Source\WeaponInfo\AR.cpp" />
+    <ClCompile Include="Source\WeaponInfo\Detonator.cpp" />
     <ClCompile Include="Source\WeaponInfo\GrenadeThrow.cpp" />
     <ClCompile Include="Source\WeaponInfo\LaserBlaster.cpp" />
+    <ClCompile Include="Source\WeaponInfo\MineThrow.cpp" />
     <ClCompile Include="Source\WeaponInfo\Pistol.cpp" />
     <ClCompile Include="Source\WeaponInfo\WeaponInfo.cpp" />
   </ItemGroup>
@@ -55,6 +59,7 @@
     <ClInclude Include="Source\PlayerInfo\PlayerInfo.h" />
     <ClInclude Include="Source\Projectile\Grenade.h" />
     <ClInclude Include="Source\Projectile\Laser.h" />
+    <ClInclude Include="Source\Projectile\Mine.h" />
     <ClInclude Include="Source\Projectile\Projectile.h" />
     <ClInclude Include="Source\SceneGraph\SceneGraph.h" />
     <ClInclude Include="Source\SceneGraph\SceneNode.h" />
@@ -68,8 +73,11 @@
     <ClInclude Include="Source\TextEntity.h" />
     <ClInclude Include="Source\Waypoint\Waypoint.h" />
     <ClInclude Include="Source\Waypoint\WaypointManager.h" />
+    <ClInclude Include="Source\WeaponInfo\AR.h" />
+    <ClInclude Include="Source\WeaponInfo\Detonator.h" />
     <ClInclude Include="Source\WeaponInfo\GrenadeThrow.h" />
     <ClInclude Include="Source\WeaponInfo\LaserBlaster.h" />
+    <ClInclude Include="Source\WeaponInfo\MineThrow.h" />
     <ClInclude Include="Source\WeaponInfo\Pistol.h" />
     <ClInclude Include="Source\WeaponInfo\WeaponInfo.h" />
   </ItemGroup>

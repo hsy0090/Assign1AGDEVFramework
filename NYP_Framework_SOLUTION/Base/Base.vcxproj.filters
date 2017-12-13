@@ -132,6 +132,18 @@
     <ClCompile Include="Source\Waypoint\WaypointManager.cpp">
       <Filter>Waypoint</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Projectile\Mine.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WeaponInfo\MineThrow.cpp">
+      <Filter>WeaponInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WeaponInfo\AR.cpp">
+      <Filter>WeaponInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WeaponInfo\Detonator.cpp">
+      <Filter>WeaponInfo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -220,6 +232,18 @@
     </ClInclude>
     <ClInclude Include="Source\Waypoint\WaypointManager.h">
       <Filter>Waypoint</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Projectile\Mine.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WeaponInfo\MineThrow.h">
+      <Filter>WeaponInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WeaponInfo\AR.h">
+      <Filter>WeaponInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WeaponInfo\Detonator.h">
+      <Filter>WeaponInfo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

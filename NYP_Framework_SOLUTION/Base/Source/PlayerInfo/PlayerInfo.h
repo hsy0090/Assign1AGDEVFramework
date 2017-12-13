@@ -96,6 +96,24 @@ public:
 	void AttachCamera(FPSCamera* _cameraPtr);
 	void DetachCamera(void);
 
+	//Health
+	float GetHealth();
+	void AddHealth(float _hp);
+	//Score
+	float GetScore();
+	void AddScore(float _score);
+
+	//Weapon
+	//primary
+	bool ChangePWeapon(void);
+	int GetPWeapon(void) const;
+	CWeaponInfo** weaponPManager;
+
+	//Secondary
+	bool ChangeSWeapon(void);
+	int GetSWeapon(void) const;
+	CWeaponInfo** weaponSManager;
+
 private:
 	Vector3 defaultPosition, defaultTarget, defaultUp;
 	Vector3 position, target, up;
@@ -117,4 +135,18 @@ private:
 
 	CWeaponInfo* primaryWeapon;
 	CWeaponInfo* secondaryWeapon;
+
+	//Health 
+	float m_fhealth;
+
+	//Score
+	int m_iscore;
+
+	//Weapon
+	//primary
+	int m_iCurrentPWeapon;
+	const int m_iNumOfPWeapon = 3;
+	//secondary
+	int m_iCurrentSWeapon;
+	const int m_iNumOfSWeapon = 2;
 };

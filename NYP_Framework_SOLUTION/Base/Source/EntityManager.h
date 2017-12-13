@@ -5,6 +5,7 @@
 #include <list>
 #include "Vector3.h"
 #include "SpatialPartition\SpatialPartition.h"
+#include "PlayerInfo\PlayerInfo.h"
 
 class EntityBase;
 

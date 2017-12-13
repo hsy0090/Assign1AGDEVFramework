@@ -40,7 +40,7 @@ SceneText::SceneText(SceneManager* _sceneMgr)
 
 SceneText::~SceneText()
 {
-	CWaypointManager::GetInstance()->DropInstance();
+	//CWaypointManager::GetInstance()->DropInstance();
 	CSpatialPartition::GetInstance()->RemoveCamera();
 	CSceneGraph::GetInstance()->Destroy();
 }
@@ -245,15 +245,27 @@ void SceneText::Init()
 	float halfWindowHeight = Application::GetInstance().GetWindowHeight() / 2.0f;
 	float fontSize = 25.0f;
 	float halfFontSize = fontSize / 2.0f;
-	for (int i = 0; i < 3; ++i)
+
+	for (int i = 0; i < 5; ++i)
 	{
-		textObj[i] = Create::Text2DObject("text", Vector3(-halfWindowWidth, -halfWindowHeight + fontSize*i + halfFontSize, 0.0f), "", Vector3(fontSize, fontSize, fontSize), Color(0.0f,1.0f,0.0f));
+		Left[i] = Create::Text2DObject("text", Vector3(-halfWindowWidth, -halfWindowHeight + fontSize*i + halfFontSize, 0.0f), "", Vector3(fontSize, fontSize, fontSize), Color(0.0f, 1.0f, 0.0f));
 	}
-	textObj[0]->SetText("HELLO WORLD");
+	Left[0]->SetText("HELLO WORLD");
+
+	for (int i = 0; i < 5; ++i)
+	{
+		Right[i] = Create::Text2DObject("text", Vector3(halfWindowWidth / 10, -halfWindowHeight + fontSize*i + halfFontSize, 0.0f), "", Vector3(fontSize, fontSize, fontSize), Color(0.0f, 1.0f, 0.0f));
+	}
+	Right[0]->SetText("HELLO WORLD");
+
+	Top[0] = Create::Text2DObject("text", Vector3(-halfWindowWidth / 2, halfWindowHeight - fontSize * 2, 0.0f), "", Vector3(fontSize, fontSize, fontSize), Color(0.0f, 1.0f, 0.0f));
+
+	timer = 100.0;
 }
 
 void SceneText::Update(double dt)
 {
+	timer -= dt;
 	// Update our entities
 	EntityManager::GetInstance()->Update(dt);
 
@@ -327,6 +339,16 @@ void SceneText::Update(double dt)
 	}
 	// <THERE>
 
+	if (MouseController::GetInstance()->GetMouseScrollStatus(MouseController::SCROLL_TYPE_YOFFSET) != playerInfo->GetPWeapon())
+	{
+		playerInfo->ChangePWeapon();
+	}
+
+	if (KeyboardController::GetInstance()->IsKeyDown('Q'))
+	{
+		playerInfo->ChangeSWeapon();
+	}
+
 	// Update the player position and other details based on keyboard and mouse inputs
 	playerInfo->Update(dt);
 
@@ -336,16 +358,64 @@ void SceneText::Update(double dt)
 
 	// Update the 2 text object values. NOTE: Can do this in their own class but i'm lazy to do it now :P
 	// Eg. FPSRenderEntity or inside RenderUI for LightEntity
+	
+	//Health info
+	std::ostringstream ss0;
+	ss0.precision(5);
+	ss0 << "Health: " << playerInfo->GetHealth();
+	Left[0]->SetText(ss0.str());
+	
+	//Score info
+	std::ostringstream ss3;
+	ss3.precision(4);
+	ss3 << "Score: " << playerInfo->GetScore();
+	Left[1]->SetText(ss3.str());
+
+	//Debug info
 	std::ostringstream ss;
 	ss.precision(5);
 	float fps = (float)(1.f / dt);
 	ss << "FPS: " << fps;
-	textObj[1]->SetText(ss.str());
+	Left[2]->SetText(ss.str());
 
+	//Timer info
 	std::ostringstream ss1;
 	ss1.precision(4);
-	ss1 << "Player:" << playerInfo->GetPos();
-	textObj[2]->SetText(ss1.str());
+	ss1 << "Timer: " << timer;
+	Top[0]->SetText(ss1.str());
+
+	//Primary Weapon Ammo info
+	if (playerInfo->GetPWeapon() != 2)
+	{
+		std::ostringstream ss2;
+		ss2.precision(4);
+		ss2 << "PAmmo:" << playerInfo->weaponPManager[playerInfo->GetPWeapon()]->GetMagRound() << " / " << playerInfo->weaponPManager[playerInfo->GetPWeapon()]->GetTotalRound();
+		Right[0]->SetText(ss2.str());
+	}
+	else
+	{
+		std::ostringstream ss2;
+		ss2.precision(4);
+		ss2 << "PAmmo:" << playerInfo->weaponPManager[playerInfo->GetPWeapon()]->GetMagRound();
+		Right[0]->SetText(ss2.str());
+	}
+
+	//Secondary Weapon Ammo info
+	std::ostringstream ss4;
+	ss4.precision(4);
+	ss4 << "SAmmo:" << playerInfo->weaponSManager[playerInfo->GetSWeapon()]->GetMagRound() << " / " << playerInfo->weaponSManager[playerInfo->GetSWeapon()]->GetTotalRound();
+	Right[1]->SetText(ss4.str());
+
+
+	if (playerInfo->GetHealth() <= 0)
+	{
+		exit(0);
+	}
+
+	if (timer <= 0)
+	{
+		exit(0);
+	}
 }
 
 void SceneText::Render()

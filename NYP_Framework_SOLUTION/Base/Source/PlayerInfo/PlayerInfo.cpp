@@ -7,7 +7,10 @@
 #include "../Projectile/Projectile.h"
 #include "../WeaponInfo/Pistol.h"
 #include "../WeaponInfo/LaserBlaster.h"
+#include "../WeaponInfo/AR.h"
 #include "../WeaponInfo/GrenadeThrow.h"
+#include "../WeaponInfo/MineThrow.h"
+#include "../WeaponInfo/Detonator.h"
 
 // Allocating and initializing CPlayerInfo's static data member.  
 // The pointer is allocated but not the object's constructor.
@@ -26,21 +29,48 @@ CPlayerInfo::CPlayerInfo(void)
 	, m_pTerrain(NULL)
 	, primaryWeapon(NULL)
 	, secondaryWeapon(NULL)
+	, weaponPManager(NULL)
+	, weaponSManager(NULL)
+	, m_iCurrentPWeapon(0)
+	, m_iCurrentSWeapon(0)
+	, m_fhealth(100.f)
+	, m_iscore(0)
 {
 }
 
 CPlayerInfo::~CPlayerInfo(void)
 {
-	if (secondaryWeapon)
+	//deletes primary weapon
+	if (weaponPManager)
+	{
+		for (int i = 0; i < m_iNumOfPWeapon; i++)
+		{
+			delete weaponPManager[i];
+		}
+		delete[] weaponPManager;
+		weaponPManager = NULL;
+	}
+
+	if (weaponSManager)
+	{
+		for (int i = 0; i < m_iNumOfSWeapon; i++)
+		{
+			delete weaponSManager[i];
+		}
+		delete[] weaponSManager;
+		weaponSManager = NULL;
+	}
+
+	/*if (secondaryWeapon)
 	{
 		delete secondaryWeapon;
 		secondaryWeapon = NULL;
-	}
-	if (primaryWeapon)
+	}*/
+	/*if (primaryWeapon)
 	{
 		delete primaryWeapon;
 		primaryWeapon = NULL;
-	}
+	}*/
 	m_pTerrain = NULL;
 }
 
@@ -61,13 +91,29 @@ void CPlayerInfo::Init(void)
 	maxBoundary.Set(1,1,1);
 	minBoundary.Set(-1, -1, -1);
 
-	// Set the pistol as the primary weapon
-	primaryWeapon = new CPistol();
+	//Set Weapons
+	weaponPManager = new CWeaponInfo*[m_iNumOfPWeapon];
+	weaponPManager[0] = new CPistol();
+	weaponPManager[0]->Init();
+
+	weaponPManager[1] = new CAssualtRifle();
+	weaponPManager[1]->Init();
+
+	weaponPManager[2] = new CDetonator();
+	weaponPManager[2]->Init();
+
+	weaponSManager = new CWeaponInfo*[m_iNumOfSWeapon];
+	weaponSManager[0] = new CMineThrow();
+	weaponSManager[0]->Init();
+
+	weaponSManager[1] = new CGrenadeThrow();
+	weaponSManager[1]->Init();
+
+	// Set primary weapon
+	primaryWeapon = weaponPManager[GetPWeapon()];
 	primaryWeapon->Init();
-	// Set the laser blaster as the secondary weapon
-	//secondaryWeapon = new CLaserBlaster();
-	//secondaryWeapon->Init();
-	secondaryWeapon = new CGrenadeThrow();
+	// Set secondary weapon
+	secondaryWeapon = weaponSManager[GetSWeapon()];
 	secondaryWeapon->Init();
 }
 
@@ -355,8 +401,12 @@ void CPlayerInfo::Update(double dt)
 			up = rightUV.Cross(viewUV).Normalized();
 			Mtx44 rotation;
 			rotation.SetToRotation(pitch, rightUV.x, rightUV.y, rightUV.z);
-			viewUV = rotation * viewUV;
-			target = position + viewUV;
+			
+			if (!((rotation * viewUV).y > 0.8 && pitch > 0))
+			{
+				viewUV = rotation * viewUV;
+				target = position + viewUV;
+			}
 		}
 		else if (KeyboardController::GetInstance()->IsKeyDown(VK_DOWN))
 		{
@@ -367,8 +417,12 @@ void CPlayerInfo::Update(double dt)
 			up = rightUV.Cross(viewUV).Normalized();
 			Mtx44 rotation;
 			rotation.SetToRotation(pitch, rightUV.x, rightUV.y, rightUV.z);
-			viewUV = rotation * viewUV;
-			target = position + viewUV;
+			
+			if (!((rotation * viewUV).y < -0.7 && pitch < 0))
+			{
+				viewUV = rotation * viewUV;
+				target = position + viewUV;
+			}
 		}
 	}
 
@@ -396,8 +450,12 @@ void CPlayerInfo::Update(double dt)
 			up = rightUV.Cross(viewUV).Normalized();
 			Mtx44 rotation;
 			rotation.SetToRotation(pitch, rightUV.x, rightUV.y, rightUV.z);
-			viewUV = rotation * viewUV;
-			target = position + viewUV;
+			
+			if (!((rotation * viewUV).y > 0.8 && pitch > 0) && !((rotation * viewUV).y < -0.7 && pitch < 0))
+			{
+				viewUV = rotation * viewUV;
+				target = position + viewUV;
+			}
 		}
 	}
 
@@ -422,6 +480,7 @@ void CPlayerInfo::Update(double dt)
 			//secondaryWeapon->PrintSelf();
 		}
 	}
+
 	if (primaryWeapon)
 		primaryWeapon->Update(dt);
 	if (secondaryWeapon)
@@ -431,7 +490,12 @@ void CPlayerInfo::Update(double dt)
 	if (MouseController::GetInstance()->IsButtonPressed(MouseController::LMB))
 	{
 		if (primaryWeapon)
-			primaryWeapon->Discharge(position, target, this);
+		{
+			if (primaryWeapon == weaponPManager[2])
+				dynamic_cast<CDetonator*>(primaryWeapon)->Discharge();
+			else
+				primaryWeapon->Discharge(position, target, this);
+		}
 	}
 	else if (MouseController::GetInstance()->IsButtonPressed(MouseController::RMB))
 	{
@@ -439,7 +503,7 @@ void CPlayerInfo::Update(double dt)
 			secondaryWeapon->Discharge(position, target, this);
 	}
 
-	// If the user presses R key, then reset the view to default values
+	// If the user presses P key, then reset the view to default values
 	if (KeyboardController::GetInstance()->IsKeyDown('P'))
 	{
 		Reset();
@@ -494,4 +558,69 @@ void CPlayerInfo::AttachCamera(FPSCamera* _cameraPtr)
 void CPlayerInfo::DetachCamera()
 {
 	attachedCamera = nullptr;
+}
+
+float CPlayerInfo::GetHealth()
+{
+	return m_fhealth;
+}
+
+void CPlayerInfo::AddHealth(float _hp)
+{
+	m_fhealth += _hp;
+}
+
+float CPlayerInfo::GetScore()
+{
+	return m_iscore;
+}
+
+void CPlayerInfo::AddScore(float _score)
+{
+	m_iscore += _score;
+}
+
+bool CPlayerInfo::ChangePWeapon(void)
+{
+	if (MouseController::GetInstance()->GetMouseScrollStatus(MouseController::SCROLL_TYPE_YOFFSET) != m_iCurrentPWeapon)
+	{
+		if ((MouseController::GetInstance()->GetMouseScrollStatus(MouseController::SCROLL_TYPE_YOFFSET) >= 0) &&
+			(MouseController::GetInstance()->GetMouseScrollStatus(MouseController::SCROLL_TYPE_YOFFSET) < m_iNumOfPWeapon))
+		{
+			m_iCurrentPWeapon = MouseController::GetInstance()->GetMouseScrollStatus(MouseController::SCROLL_TYPE_YOFFSET);
+			primaryWeapon = weaponPManager[GetPWeapon()];
+			return true;
+		}
+	}
+	return false;
+}
+
+int CPlayerInfo::GetPWeapon(void) const
+{
+	return m_iCurrentPWeapon;
+}
+
+bool CPlayerInfo::ChangeSWeapon(void)
+{
+	m_iCurrentSWeapon++;
+
+	if (m_iCurrentSWeapon > 1)
+	{
+		m_iCurrentSWeapon = 0;
+	}
+
+	if (secondaryWeapon == weaponSManager[GetSWeapon()])
+	{
+		return false;
+	}
+	else
+	{
+		secondaryWeapon = weaponSManager[GetSWeapon()];
+		return true;
+	}
+}
+
+int CPlayerInfo::GetSWeapon(void) const
+{
+	return  m_iCurrentSWeapon;
 }
